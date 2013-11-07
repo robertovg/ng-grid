@@ -184,7 +184,10 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         i18n: 'en',
         
         //the threshold in rows to force virtualization on
-        virtualizationThreshold: 50
+        virtualizationThreshold: 50,
+
+        //If false, when you group rows, it won't add extra columns at first
+        extraColumnsWhenGrouping: true
     },
         self = this;
     self.maxCanvasHt = 0;

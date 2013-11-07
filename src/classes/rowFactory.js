@@ -217,7 +217,7 @@
         }
 
         //moved out of above loops due to if no data initially, but has initial grouping, columns won't be added
-        if(cols.length > 0) {
+        if(cols.length > 0 && grid.config.extraColumnsWhenGrouping) {
             for (var z = 0; z < groups.length; z++) {
                 if (!cols[z].isAggCol && z <= maxDepth) {
                     cols.splice(0, 0, new ngColumn({
