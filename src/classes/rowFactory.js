@@ -217,13 +217,14 @@
         }
 
         //moved out of above loops due to if no data initially, but has initial grouping, columns won't be added
-        if(cols.length > 0 && grid.config.extraColumnsWhenGrouping) {
+        //If extraColumnsWhenGrouping == true, then the left columns added when grouping have a width of 0.
+        if(cols.length > 0) {
             for (var z = 0; z < groups.length; z++) {
                 if (!cols[z].isAggCol && z <= maxDepth) {
                     cols.splice(0, 0, new ngColumn({
                         colDef: {
                             field: '',
-                            width: 25,
+                            width: grid.config.extraColumnsWhenGrouping == false ? 0 : 25,
                             sortable: false,
                             resizable: false,
                             headerCellTemplate: '<div class="ngAggHeader"></div>',

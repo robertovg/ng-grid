@@ -10,6 +10,13 @@
                     }
                     if ($scope.row.isAggRow) {
                         var html = $templateCache.get($scope.gridId + 'aggregateTemplate.html');
+                        /**
+                        * If html is an Array instead of an String ( the directly the template ),
+                        * then we use the template for each level ( depth )
+                        */
+                        if ( html instanceof Array ) {
+                            html = html[$scope.row.depth];
+                        }
                         if ($scope.row.aggLabelFilter) {
                             html = html.replace(CUSTOM_FILTERS, '| ' + $scope.row.aggLabelFilter);
                         } else {

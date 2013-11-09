@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 11/07/2013 21:07
+* Compiled At: 11/09/2013 12:47
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -2138,13 +2138,13 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
             }
             ptr.values.push(rows[x]);
         }
-        if(cols.length > 0 && grid.config.extraColumnsWhenGrouping) {
+        if(cols.length > 0) {
             for (var z = 0; z < groups.length; z++) {
                 if (!cols[z].isAggCol && z <= maxDepth) {
                     cols.splice(0, 0, new ngColumn({
                         colDef: {
                             field: '',
-                            width: 25,
+                            width: grid.config.extraColumnsWhenGrouping == false ? 0 : 25,
                             sortable: false,
                             resizable: false,
                             headerCellTemplate: '<div class="ngAggHeader"></div>',
@@ -2967,6 +2967,9 @@ ngGridDirectives.directive('ngRow', ['$compile', '$domUtilityService', '$templat
                     }
                     if ($scope.row.isAggRow) {
                         var html = $templateCache.get($scope.gridId + 'aggregateTemplate.html');
+                        if ( html instanceof Array ) {
+                            html = html[$scope.row.depth];
+                        }
                         if ($scope.row.aggLabelFilter) {
                             html = html.replace(CUSTOM_FILTERS, '| ' + $scope.row.aggLabelFilter);
                         } else {

@@ -1,72 +1,9 @@
-# ng-grid : An Angular DataGrid
+# ng-grid : An Angular DataGrid ( forked )
 
-[![Build Status](https://travis-ci.org/angular-ui/ng-grid.png)](https://travis-ci.org/angular-ui/ng-grid)
+This is a fork of the ng-grid project to allow user customize some gridOptions not available by default like:
+* An property called 'extraColumnsWhenGrouping' to don't add extra columns in the row when there are groups.
+* Now 'aggregateTemplate' can accept an array instead of the template string. In that way we can specify different templates for each group level.
 
-__Contributors:__
-
-ng-grid Team:
-* [Tim Sweet](http://ornerydevelopment.blogspot.com/)
-* [Jonathon Ricaurte](https://github.com/jonricaurte)
-* [Brian Hann](https://github.com/c0bra)
-
-License: [MIT](http://www.opensource.org/licenses/mit-license.php)
-
-Dependencies: jQuery & angular.js. (JqueryUi draggable for non-HTML5 compliant browsers to use awesome Drag-N-Drop aggregate feature. However, you can still groupby without draggability)
-
-***
-
-## About
-__ng-grid__ Originally built on knockout we wanted to port it to angular.
-
-version 2.0.7
-
-[nuGet](https://nuget.org/packages/ng-grid)
-
-
-Questions, Comments, Complaints? feel free to email us at nggridteam@gmail.com
-
-***
-
-## Roadmap
-
-We are going to be adding more features here as we head to a 3.0 release, including:
-
-* Anything else the rest of the community wants to contribute that isn't a terrible idea. :)
-
-***
-_The bare bones_:
-
-```html
-<script type="text/javascript" src="angular.js"></script>
-<script type="text/javascript" src="ng-grid.js"></script>
-<script>
-    angular.module('myApp',['ngGrid', ... {other includes}]);
-</script>
-<link rel="stylesheet" type="text/css" href="../ng-grid.css" /> 
-<body ng-app="myApp">
-    <div ng-grid="myOptions"></div>
-</body>
-```
-```javascript
-// Define your own controller somewhere..
-function MyCtrl($scope) {
-	$scope.myData = [{name: "Moroni", age: 50},
-                     {name: "Teancum", age: 43},
-                     {name: "Jacob", age: 27},
-                     {name: "Nephi", age: 29},
-                     {name: "Enos", age: 34}];
-	$scope.myOptions = { data: 'myData' };
-	// you can also specify data as: $scope.myOptions = { data: $scope.myData }. 
-	// However, updates to the underlying data will not be reflected in the grid
-};
-
-```
-
-## Want More?
-Check out the [Getting Started](https://github.com/angular-ui/ng-grid/wiki/Getting-started) and other [Docs](https://github.com/angular-ui/ng-grid/wiki)
-
-## Examples
-[Examples](http://angular-ui.github.com/ng-grid/)
 
 ## Testing
 
