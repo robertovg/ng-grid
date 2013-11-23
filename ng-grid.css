@@ -163,14 +163,11 @@
 .ngColMenu {
   right: 2px;
   padding: 5px;
-  height: 300px;
   top: 25px;
-  overflow-x: scroll;
-  overflow-y: scroll;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
-  background-color: #fdfdfd;
+  background-color: #bdd0cb;
   position: absolute;
   border: 2px solid #d4d4d4;
   z-index: 1;

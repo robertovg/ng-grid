@@ -1,7 +1,9 @@
 # ng-grid : An Angular DataGrid ( forked )
 
-This is a fork of the ng-grid project. The focus on this fork is to provide some needed performance improvements and
-style changes.
+This is a fork of the ng-grid project to allow user customize some gridOptions not available by default like:
+* An property called 'extraColumnsWhenGrouping' to don't add extra columns in the row when there are groups.
+* Now 'aggregateTemplate' can accept an array instead of the template string. In that way we can specify different templates for each group level.
+* Added @semeltheone performance improvement to this folk.
 
 ## Testing
 

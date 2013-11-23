@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 11/09/2013 14:42
+* Compiled At: 11/23/2013 12:18
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -938,12 +938,12 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
     // The init method gets called during the ng-grid directive execution.
     self.colToMove = undefined;
     self.groupToMove = undefined;
-    self.assignEvents = function() {
+    self.assignEvents = function () {
         // Here we set the onmousedown event handler to the header container.
         if (grid.config.jqueryUIDraggable && !grid.config.enablePinning) {
             grid.$groupPanel.droppable({
                 addClasses: false,
-                drop: function(event) {
+                drop: function (event) {
                     self.onGroupDrop(event);
                 }
             });
@@ -954,24 +954,26 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
                 grid.$headerScroller.on('drop', self.onHeaderDrop);
             }
         }
-        $scope.$watch('renderedColumns', function() {
+        var debouncedColumnsRendered = _.debounce(onColumnsRendered, 170);
+        $scope.$watch('renderedColumns', debouncedColumnsRendered);
+        function onColumnsRendered() {
             $timeout(self.setDraggables);
-        });
+        }
     };
-    self.dragStart = function(evt){		
-      //FireFox requires there to be dataTransfer if you want to drag and drop.
-      evt.dataTransfer.setData('text', ''); //cannot be empty string
+    self.dragStart = function (evt) {
+        //FireFox requires there to be dataTransfer if you want to drag and drop.
+        evt.dataTransfer.setData('text', ''); //cannot be empty string
     };
-    self.dragOver = function(evt) {
+    self.dragOver = function (evt) {
         evt.preventDefault();
     };
     //For JQueryUI
-    self.setDraggables = function() {
+    self.setDraggables = function () {
         if (!grid.config.jqueryUIDraggable) {
             //Fix for FireFox. Instead of using jQuery on('dragstart', function) on find, we have to use addEventListeners for each column.
             var columns = grid.$root.find('.ngHeaderSortColumn'); //have to iterate if using addEventListener
-            angular.forEach(columns, function(col){
-                if(col.className && col.className.indexOf("ngHeaderSortColumn") !== -1){
+            angular.forEach(columns, function (col) {
+                if (col.className && col.className.indexOf("ngHeaderSortColumn") !== -1) {
                     col.setAttribute('draggable', 'true');
                     //jQuery 'on' function doesn't have  dataTransfer as part of event in handler unless added to event props, which is not recommended
                     //See more here: http://api.jquery.com/category/events/event-object/
@@ -980,12 +982,12 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
                     }
                 }
             });
-            if (navigator.userAgent.indexOf("MSIE") !== -1){
+            if (navigator.userAgent.indexOf("MSIE") !== -1) {
                 //call native IE dragDrop() to start dragging
-                grid.$root.find('.ngHeaderSortColumn').bind('selectstart', function () { 
-                    this.dragDrop(); 
-                    return false; 
-                });	
+                grid.$root.find('.ngHeaderSortColumn').bind('selectstart', function () {
+                    this.dragDrop();
+                    return false;
+                });
             }
         } else {
             grid.$root.find('.ngHeaderSortColumn').draggable({
@@ -993,17 +995,17 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
                 appendTo: 'body',
                 stack: 'div',
                 addClasses: false,
-                start: function(event) {
+                start: function (event) {
                     self.onHeaderMouseDown(event);
                 }
             }).droppable({
-                drop: function(event) {
-                    self.onHeaderDrop(event);
-                }
-            });
+                    drop: function (event) {
+                        self.onHeaderDrop(event);
+                    }
+                });
         }
     };
-    self.onGroupMouseDown = function(event) {
+    self.onGroupMouseDown = function (event) {
         var groupItem = $(event.target);
         // Get the scope from the header container
         if (groupItem[0].className !== 'ngRemoveGroup') {
@@ -1012,15 +1014,15 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
                 // set draggable events
                 if (!grid.config.jqueryUIDraggable) {
                     groupItem.attr('draggable', 'true');
-                    if(this.addEventListener){//IE8 doesn't have drag drop or event listeners
-                        this.addEventListener('dragstart', self.dragStart); 
+                    if (this.addEventListener) {//IE8 doesn't have drag drop or event listeners
+                        this.addEventListener('dragstart', self.dragStart);
                     }
-                    if (navigator.userAgent.indexOf("MSIE") !== -1){
+                    if (navigator.userAgent.indexOf("MSIE") !== -1) {
                         //call native IE dragDrop() to start dragging
-                        groupItem.bind('selectstart', function () { 
-                            this.dragDrop(); 
-                            return false; 
-                        });	
+                        groupItem.bind('selectstart', function () {
+                            this.dragDrop();
+                            return false;
+                        });
                     }
                 }
                 // Save the column for later.
@@ -1030,7 +1032,7 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
             self.groupToMove = undefined;
         }
     };
-    self.onGroupDrop = function(event) {
+    self.onGroupDrop = function (event) {
         event.stopPropagation();
         // clear out the colToMove object
         var groupContainer;
@@ -1074,7 +1076,7 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
         }
     };
     //Header functions
-    self.onHeaderMouseDown = function(event) {
+    self.onHeaderMouseDown = function (event) {
         // Get the closest header container from where we clicked.
         var headerContainer = $(event.target).closest('.ngHeaderSortColumn');
         // Get the scope from the header container
@@ -1084,7 +1086,7 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
             self.colToMove = { header: headerContainer, col: headerScope.col };
         }
     };
-    self.onHeaderDrop = function(event) {
+    self.onHeaderDrop = function (event) {
         if (!self.colToMove || self.colToMove.col.pinned) {
             return;
         }
@@ -1107,7 +1109,7 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
         }
     };
 
-    self.assignGridEventHandlers = function() {
+    self.assignGridEventHandlers = function () {
         //Chrome and firefox both need a tab index so the grid can recieve focus.
         //need to give the grid a tabindex if it doesn't already have one so
         //we'll just give it a tab index of the corresponding gridcache index 
@@ -1121,20 +1123,20 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
         }
         // resize on window resize
         var windowThrottle;
-        $(window).resize(function(){
+        $(window).resize(function () {
             clearTimeout(windowThrottle);
-            windowThrottle = setTimeout(function() {
+            windowThrottle = setTimeout(function () {
                 //in function for IE8 compatibility
-                domUtilityService.RebuildGrid($scope,grid);
+                domUtilityService.RebuildGrid($scope, grid);
             }, 100);
         });
         // resize on parent resize as well.
         var parentThrottle;
-        $(grid.$root.parent()).on('resize', function() {
+        $(grid.$root.parent()).on('resize', function () {
             clearTimeout(parentThrottle);
-            parentThrottle = setTimeout(function() {
+            parentThrottle = setTimeout(function () {
                 //in function for IE8 compatibility
-                domUtilityService.RebuildGrid($scope,grid);
+                domUtilityService.RebuildGrid($scope, grid);
             }, 100);
         });
     };
@@ -3337,7 +3339,10 @@ ngGridDirectives.directive('ngViewport', [function() {
         var isMouseWheelActive;
         var prevScollLeft;
         var prevScollTop = 0;
-        elm.bind('scroll', function(evt) {
+        var debouncedScrollingHandler =  _.debounce(onScrollHandler,50,{trailing:true});
+
+        elm.bind('scroll', debouncedScrollingHandler);
+        function onScrollHandler(evt) {
             var scrollLeft = evt.target.scrollLeft,
                 scrollTop = evt.target.scrollTop;
             if ($scope.$headerContainer) {
@@ -3352,7 +3357,8 @@ ngGridDirectives.directive('ngViewport', [function() {
             prevScollTop = scrollTop;
             isMouseWheelActive = false;
             return true;
-        });
+        }
+
         elm.bind("mousewheel DOMMouseScroll", function() {
             isMouseWheelActive = true;
             if (elm.focus) { elm.focus(); }

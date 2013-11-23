@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 11/09/2013 14:42
+* Compiled At: 11/23/2013 12:18
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -891,11 +891,11 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
     var self = this;
     self.colToMove = undefined;
     self.groupToMove = undefined;
-    self.assignEvents = function() {
+    self.assignEvents = function () {
         if (grid.config.jqueryUIDraggable && !grid.config.enablePinning) {
             grid.$groupPanel.droppable({
                 addClasses: false,
-                drop: function(event) {
+                drop: function (event) {
                     self.onGroupDrop(event);
                 }
             });
@@ -906,32 +906,34 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
                 grid.$headerScroller.on('drop', self.onHeaderDrop);
             }
         }
-        $scope.$watch('renderedColumns', function() {
+        var debouncedColumnsRendered = _.debounce(onColumnsRendered, 170);
+        $scope.$watch('renderedColumns', debouncedColumnsRendered);
+        function onColumnsRendered() {
             $timeout(self.setDraggables);
-        });
+        }
     };
-    self.dragStart = function(evt){
-      evt.dataTransfer.setData('text', ''); 
+    self.dragStart = function (evt) {
+        evt.dataTransfer.setData('text', ''); 
     };
-    self.dragOver = function(evt) {
+    self.dragOver = function (evt) {
         evt.preventDefault();
     };
-    self.setDraggables = function() {
+    self.setDraggables = function () {
         if (!grid.config.jqueryUIDraggable) {
             var columns = grid.$root.find('.ngHeaderSortColumn'); 
-            angular.forEach(columns, function(col){
-                if(col.className && col.className.indexOf("ngHeaderSortColumn") !== -1){
+            angular.forEach(columns, function (col) {
+                if (col.className && col.className.indexOf("ngHeaderSortColumn") !== -1) {
                     col.setAttribute('draggable', 'true');
                     if (col.addEventListener) { 
                         col.addEventListener('dragstart', self.dragStart);
                     }
                 }
             });
-            if (navigator.userAgent.indexOf("MSIE") !== -1){
-                grid.$root.find('.ngHeaderSortColumn').bind('selectstart', function () { 
-                    this.dragDrop(); 
-                    return false; 
-                });	
+            if (navigator.userAgent.indexOf("MSIE") !== -1) {
+                grid.$root.find('.ngHeaderSortColumn').bind('selectstart', function () {
+                    this.dragDrop();
+                    return false;
+                });
             }
         } else {
             grid.$root.find('.ngHeaderSortColumn').draggable({
@@ -939,31 +941,31 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
                 appendTo: 'body',
                 stack: 'div',
                 addClasses: false,
-                start: function(event) {
+                start: function (event) {
                     self.onHeaderMouseDown(event);
                 }
             }).droppable({
-                drop: function(event) {
-                    self.onHeaderDrop(event);
-                }
-            });
+                    drop: function (event) {
+                        self.onHeaderDrop(event);
+                    }
+                });
         }
     };
-    self.onGroupMouseDown = function(event) {
+    self.onGroupMouseDown = function (event) {
         var groupItem = $(event.target);
         if (groupItem[0].className !== 'ngRemoveGroup') {
             var groupItemScope = angular.element(groupItem).scope();
             if (groupItemScope) {
                 if (!grid.config.jqueryUIDraggable) {
                     groupItem.attr('draggable', 'true');
-                    if(this.addEventListener){
-                        this.addEventListener('dragstart', self.dragStart); 
+                    if (this.addEventListener) {
+                        this.addEventListener('dragstart', self.dragStart);
                     }
-                    if (navigator.userAgent.indexOf("MSIE") !== -1){
-                        groupItem.bind('selectstart', function () { 
-                            this.dragDrop(); 
-                            return false; 
-                        });	
+                    if (navigator.userAgent.indexOf("MSIE") !== -1) {
+                        groupItem.bind('selectstart', function () {
+                            this.dragDrop();
+                            return false;
+                        });
                     }
                 }
                 self.groupToMove = { header: groupItem, groupName: groupItemScope.group, index: groupItemScope.$index };
@@ -972,7 +974,7 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
             self.groupToMove = undefined;
         }
     };
-    self.onGroupDrop = function(event) {
+    self.onGroupDrop = function (event) {
         event.stopPropagation();
         var groupContainer;
         var groupScope;
@@ -1010,14 +1012,14 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
             $scope.$apply();
         }
     };
-    self.onHeaderMouseDown = function(event) {
+    self.onHeaderMouseDown = function (event) {
         var headerContainer = $(event.target).closest('.ngHeaderSortColumn');
         var headerScope = angular.element(headerContainer).scope();
         if (headerScope) {
             self.colToMove = { header: headerContainer, col: headerScope.col };
         }
     };
-    self.onHeaderDrop = function(event) {
+    self.onHeaderDrop = function (event) {
         if (!self.colToMove || self.colToMove.col.pinned) {
             return;
         }
@@ -1035,7 +1037,7 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
         }
     };
 
-    self.assignGridEventHandlers = function() {
+    self.assignGridEventHandlers = function () {
         if (grid.config.tabIndex === -1) {
             grid.$viewport.attr('tabIndex', domUtilityService.numberOfGrids);
             domUtilityService.numberOfGrids++;
@@ -1043,17 +1045,17 @@ var ngEventProvider = function (grid, $scope, domUtilityService, $timeout) {
             grid.$viewport.attr('tabIndex', grid.config.tabIndex);
         }
         var windowThrottle;
-        $(window).resize(function(){
+        $(window).resize(function () {
             clearTimeout(windowThrottle);
-            windowThrottle = setTimeout(function() {
-                domUtilityService.RebuildGrid($scope,grid);
+            windowThrottle = setTimeout(function () {
+                domUtilityService.RebuildGrid($scope, grid);
             }, 100);
         });
         var parentThrottle;
-        $(grid.$root.parent()).on('resize', function() {
+        $(grid.$root.parent()).on('resize', function () {
             clearTimeout(parentThrottle);
-            parentThrottle = setTimeout(function() {
-                domUtilityService.RebuildGrid($scope,grid);
+            parentThrottle = setTimeout(function () {
+                domUtilityService.RebuildGrid($scope, grid);
             }, 100);
         });
     };
@@ -2993,7 +2995,10 @@ ngGridDirectives.directive('ngViewport', [function() {
         var isMouseWheelActive;
         var prevScollLeft;
         var prevScollTop = 0;
-        elm.bind('scroll', function(evt) {
+        var debouncedScrollingHandler =  _.debounce(onScrollHandler,50,{trailing:true});
+
+        elm.bind('scroll', debouncedScrollingHandler);
+        function onScrollHandler(evt) {
             var scrollLeft = evt.target.scrollLeft,
                 scrollTop = evt.target.scrollTop;
             if ($scope.$headerContainer) {
@@ -3008,7 +3013,8 @@ ngGridDirectives.directive('ngViewport', [function() {
             prevScollTop = scrollTop;
             isMouseWheelActive = false;
             return true;
-        });
+        }
+
         elm.bind("mousewheel DOMMouseScroll", function() {
             isMouseWheelActive = true;
             if (elm.focus) { elm.focus(); }
