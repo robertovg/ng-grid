@@ -3,7 +3,10 @@ ngGridDirectives.directive('ngViewport', [function() {
         var isMouseWheelActive;
         var prevScollLeft;
         var prevScollTop = 0;
-        elm.bind('scroll', function(evt) {
+        var debouncedScrollingHandler =  _.debounce(onScrollHandler,50,{trailing:true});
+
+        elm.bind('scroll', debouncedScrollingHandler);
+        function onScrollHandler(evt) {
             var scrollLeft = evt.target.scrollLeft,
                 scrollTop = evt.target.scrollTop;
             if ($scope.$headerContainer) {
@@ -18,7 +21,8 @@ ngGridDirectives.directive('ngViewport', [function() {
             prevScollTop = scrollTop;
             isMouseWheelActive = false;
             return true;
-        });
+        }
+
         elm.bind("mousewheel DOMMouseScroll", function() {
             isMouseWheelActive = true;
             if (elm.focus) { elm.focus(); }
