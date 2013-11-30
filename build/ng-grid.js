@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 11/23/2013 12:18
+* Compiled At: 11/30/2013 22:42
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -1194,7 +1194,9 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         useExternalSorting: false,
         i18n: 'en',
         virtualizationThreshold: 50,
-        extraColumnsWhenGrouping: true
+        extraColumnsWhenGrouping: true,
+        keepUncollapsedRowsOpen: false
+
     },
         self = this;
     self.maxCanvasHt = 0;
@@ -1972,10 +1974,11 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
         return new ngRow(entity, self.rowConfig, self.selectionProvider, rowIndex, $utils);
     };
 
-    self.buildAggregateRow = function(aggEntity, rowIndex) {
+    self.buildAggregateRow = function(aggEntity, rowIndex, keepOpen) {
         var agg = self.aggCache[aggEntity.aggIndex]; 
         if (!agg) {
-            agg = new ngAggregate(aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault);
+            agg = new ngAggregate(aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
+                !keepOpen);
             self.aggCache[aggEntity.aggIndex] = agg;
         }
         agg.rowIndex = rowIndex;
@@ -2068,6 +2071,12 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
                 if (prop === NG_FIELD || prop === NG_DEPTH || prop === NG_COLUMN) {
                     continue;
                 } else if (g.hasOwnProperty(prop)) {
+                    var keepOpen = false;
+                    if(grid.config.keepUncollapsedRowsOpen === true) {
+                        if(prop === 'Roberto0') {
+                           keepOpen = true;
+                        }
+                    }
                     var agg = self.buildAggregateRow({
                         gField: g[NG_FIELD],
                         gLabel: prop,
@@ -2078,7 +2087,7 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
                         aggChildren: [],
                         aggIndex: self.numberOfAggregates,
                         aggLabelFilter: g[NG_COLUMN].aggLabelFilter
-                    }, 0);
+                    }, 0, keepOpen);
                     self.numberOfAggregates++;
                     agg.parent = self.parentCache[agg.depth - 1];
                     if (agg.parent) {
@@ -2106,20 +2115,24 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
             });
         }
 
+        var keepOpen = false;
         for (var x = 0; x < rows.length; x++) {
             var model = rows[x].entity;
             if (!model) {
                 return;
             }
-            rows[x][NG_HIDDEN] = grid.config.groupsCollapsedByDefault;
             var ptr = self.groupedData;
-
             for (var y = 0; y < groups.length; y++) {
                 var group = groups[y];
 
                 var col = filterCols(cols, group)[0];
 
                 var val = $utils.evalProperty(model, group);
+                if( grid.config.keepUncollapsedRowsOpen ) {
+                    if( y == groups.length - 1) {
+                        keepOpen = ( val === 'Roberto0');
+                    }
+                }
                 val = val ? val.toString() : 'null';
                 if (!ptr[val]) {
                     ptr[val] = {};
@@ -2138,6 +2151,7 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
             if (!ptr.values) {
                 ptr.values = [];
             }
+            rows[x][NG_HIDDEN] = grid.config.groupsCollapsedByDefault && !keepOpen;
             ptr.values.push(rows[x]);
         }
         if(cols.length > 0) {

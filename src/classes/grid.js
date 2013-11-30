@@ -187,7 +187,11 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         virtualizationThreshold: 50,
 
         //If false, when you group rows, it won't add extra columns at first
-        extraColumnsWhenGrouping: true
+        extraColumnsWhenGrouping: true,
+
+        //Keep groups which are opened, opened when reopening
+        keepUncollapsedRowsOpen: false
+
     },
         self = this;
     self.maxCanvasHt = 0;

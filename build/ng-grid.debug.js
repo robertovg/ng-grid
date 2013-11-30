@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 11/23/2013 12:18
+* Compiled At: 11/30/2013 22:42
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -1400,7 +1400,11 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         virtualizationThreshold: 50,
 
         //If false, when you group rows, it won't add extra columns at first
-        extraColumnsWhenGrouping: true
+        extraColumnsWhenGrouping: true,
+
+        //Keep groups which are opened, opened when reopening
+        keepUncollapsedRowsOpen: false
+
     },
         self = this;
     self.maxCanvasHt = 0;
@@ -2243,11 +2247,12 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
         return new ngRow(entity, self.rowConfig, self.selectionProvider, rowIndex, $utils);
     };
 
-    self.buildAggregateRow = function(aggEntity, rowIndex) {
+    self.buildAggregateRow = function(aggEntity, rowIndex, keepOpen) {
         var agg = self.aggCache[aggEntity.aggIndex]; // first check to see if we've already built it 
         if (!agg) {
             // build the row
-            agg = new ngAggregate(aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault);
+            agg = new ngAggregate(aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
+                !keepOpen);
             self.aggCache[aggEntity.aggIndex] = agg;
         }
         agg.rowIndex = rowIndex;
@@ -2346,6 +2351,13 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
                 if (prop === NG_FIELD || prop === NG_DEPTH || prop === NG_COLUMN) {
                     continue;
                 } else if (g.hasOwnProperty(prop)) {
+                    var keepOpen = false;
+                    if(grid.config.keepUncollapsedRowsOpen === true) {
+                        //The condition to keep a group open
+                        if(prop === 'Roberto0') {
+                           keepOpen = true;
+                        }
+                    }
                     //build the aggregate row
                     var agg = self.buildAggregateRow({
                         gField: g[NG_FIELD],
@@ -2357,7 +2369,7 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
                         aggChildren: [],
                         aggIndex: self.numberOfAggregates,
                         aggLabelFilter: g[NG_COLUMN].aggLabelFilter
-                    }, 0);
+                    }, 0, keepOpen);
                     self.numberOfAggregates++;
                     //set the aggregate parent to the parent in the array that is one less deep.
                     agg.parent = self.parentCache[agg.depth - 1];
@@ -2392,20 +2404,26 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
             });
         }
 
+        var keepOpen = false;
         for (var x = 0; x < rows.length; x++) {
             var model = rows[x].entity;
             if (!model) {
                 return;
             }
-            rows[x][NG_HIDDEN] = grid.config.groupsCollapsedByDefault;
             var ptr = self.groupedData;
-
             for (var y = 0; y < groups.length; y++) {
                 var group = groups[y];
 
                 var col = filterCols(cols, group)[0];
 
                 var val = $utils.evalProperty(model, group);
+                //If it's configured to remember the last groups uncollapsed when initial print
+                if( grid.config.keepUncollapsedRowsOpen ) {
+                    //This is only for the last grouped parameter
+                    if( y == groups.length - 1) {
+                        keepOpen = ( val === 'Roberto0');
+                    }
+                }
                 val = val ? val.toString() : 'null';
                 if (!ptr[val]) {
                     ptr[val] = {};
@@ -2424,8 +2442,11 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
             if (!ptr.values) {
                 ptr.values = [];
             }
+            rows[x][NG_HIDDEN] = grid.config.groupsCollapsedByDefault && !keepOpen;
             ptr.values.push(rows[x]);
+            
         }
+
 
         //moved out of above loops due to if no data initially, but has initial grouping, columns won't be added
         //If extraColumnsWhenGrouping == true, then the left columns added when grouping have a width of 0.
