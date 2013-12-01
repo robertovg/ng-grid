@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 11/30/2013 22:42
+* Compiled At: 12/01/2013 14:06
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -634,6 +634,21 @@ var ngAggregate = function (aggEntity, rowFactory, rowHeight, groupInitState) {
 
 ngAggregate.prototype.toggleExpand = function () {
     this.collapsed = this.collapsed ? false : true;
+    // Storing or deleting the key to keep open
+    if( this.keepUncollapsedRowsOpen === true && this.depth == 1 ) {
+        // Opening
+        if( !this.collapsed ) {
+            if( this.uncollapsedRowsList.indexOf(this.label) == -1 ) {
+                this.uncollapsedRowsList.push(this.label);
+            }
+        // Cosing
+        } else {
+            this.uncollapsedRowsList.splice(
+                this.uncollapsedRowsList.indexOf(this.label),
+                1
+            );
+        }
+    }
     if (this.orig) {
         this.orig.collapsed = this.collapsed;
     }
@@ -1403,7 +1418,11 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         extraColumnsWhenGrouping: true,
 
         //Keep groups which are opened, opened when reopening
-        keepUncollapsedRowsOpen: false
+        keepUncollapsedRowsOpen: false,
+        
+        //Opened groups by default, if you want to persist them even when you create new ng-grid instance, then 
+        //  you have to store the array in a $scope variable of your application.
+        uncollapsedRowsList: []
 
     },
         self = this;
@@ -2239,6 +2258,8 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
     };
 
     self.renderedRange = new ngRange(0, grid.minRowsToRender() + EXCESS_ROWS);
+    ngAggregate.prototype.keepUncollapsedRowsOpen = grid.config.keepUncollapsedRowsOpen;
+    ngAggregate.prototype.uncollapsedRowsList = grid.config.uncollapsedRowsList;
 
     // @entity - the data item
     // @rowIndex - the index of the row
@@ -2251,8 +2272,8 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
         var agg = self.aggCache[aggEntity.aggIndex]; // first check to see if we've already built it 
         if (!agg) {
             // build the row
-            agg = new ngAggregate(aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
-                !keepOpen);
+            agg = new ngAggregate( aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
+                !keepOpen );
             self.aggCache[aggEntity.aggIndex] = agg;
         }
         agg.rowIndex = rowIndex;
@@ -2354,7 +2375,7 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
                     var keepOpen = false;
                     if(grid.config.keepUncollapsedRowsOpen === true) {
                         //The condition to keep a group open
-                        if(prop === 'Roberto0') {
+                        if( grid.config.uncollapsedRowsList.indexOf(prop) >= 0 ) {
                            keepOpen = true;
                         }
                     }
@@ -2418,10 +2439,10 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
 
                 var val = $utils.evalProperty(model, group);
                 //If it's configured to remember the last groups uncollapsed when initial print
-                if( grid.config.keepUncollapsedRowsOpen ) {
+                if( grid.config.keepUncollapsedRowsOpen === true ) {
                     //This is only for the last grouped parameter
                     if( y == groups.length - 1) {
-                        keepOpen = ( val === 'Roberto0');
+                        keepOpen = ( grid.config.uncollapsedRowsList.indexOf(val) >= 0 );
                     }
                 }
                 val = val ? val.toString() : 'null';

@@ -20,6 +20,21 @@ var ngAggregate = function (aggEntity, rowFactory, rowHeight, groupInitState) {
 
 ngAggregate.prototype.toggleExpand = function () {
     this.collapsed = this.collapsed ? false : true;
+    // Storing or deleting the key to keep open
+    if( this.keepUncollapsedRowsOpen === true && this.depth == 1 ) {
+        // Opening
+        if( !this.collapsed ) {
+            if( this.uncollapsedRowsList.indexOf(this.label) == -1 ) {
+                this.uncollapsedRowsList.push(this.label);
+            }
+        // Cosing
+        } else {
+            this.uncollapsedRowsList.splice(
+                this.uncollapsedRowsList.indexOf(this.label),
+                1
+            );
+        }
+    }
     if (this.orig) {
         this.orig.collapsed = this.collapsed;
     }

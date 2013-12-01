@@ -24,6 +24,8 @@
     };
 
     self.renderedRange = new ngRange(0, grid.minRowsToRender() + EXCESS_ROWS);
+    ngAggregate.prototype.keepUncollapsedRowsOpen = grid.config.keepUncollapsedRowsOpen;
+    ngAggregate.prototype.uncollapsedRowsList = grid.config.uncollapsedRowsList;
 
     // @entity - the data item
     // @rowIndex - the index of the row
@@ -36,8 +38,8 @@
         var agg = self.aggCache[aggEntity.aggIndex]; // first check to see if we've already built it 
         if (!agg) {
             // build the row
-            agg = new ngAggregate(aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
-                !keepOpen);
+            agg = new ngAggregate( aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
+                !keepOpen );
             self.aggCache[aggEntity.aggIndex] = agg;
         }
         agg.rowIndex = rowIndex;
@@ -139,7 +141,7 @@
                     var keepOpen = false;
                     if(grid.config.keepUncollapsedRowsOpen === true) {
                         //The condition to keep a group open
-                        if(prop === 'Roberto0') {
+                        if( grid.config.uncollapsedRowsList.indexOf(prop) >= 0 ) {
                            keepOpen = true;
                         }
                     }
@@ -203,10 +205,10 @@
 
                 var val = $utils.evalProperty(model, group);
                 //If it's configured to remember the last groups uncollapsed when initial print
-                if( grid.config.keepUncollapsedRowsOpen ) {
+                if( grid.config.keepUncollapsedRowsOpen === true ) {
                     //This is only for the last grouped parameter
                     if( y == groups.length - 1) {
-                        keepOpen = ( val === 'Roberto0');
+                        keepOpen = ( grid.config.uncollapsedRowsList.indexOf(val) >= 0 );
                     }
                 }
                 val = val ? val.toString() : 'null';

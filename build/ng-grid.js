@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 11/30/2013 22:42
+* Compiled At: 12/01/2013 14:06
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -594,6 +594,18 @@ var ngAggregate = function (aggEntity, rowFactory, rowHeight, groupInitState) {
 
 ngAggregate.prototype.toggleExpand = function () {
     this.collapsed = this.collapsed ? false : true;
+    if( this.keepUncollapsedRowsOpen === true && this.depth == 1 ) {
+        if( !this.collapsed ) {
+            if( this.uncollapsedRowsList.indexOf(this.label) == -1 ) {
+                this.uncollapsedRowsList.push(this.label);
+            }
+        } else {
+            this.uncollapsedRowsList.splice(
+                this.uncollapsedRowsList.indexOf(this.label),
+                1
+            );
+        }
+    }
     if (this.orig) {
         this.orig.collapsed = this.collapsed;
     }
@@ -1195,7 +1207,8 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         i18n: 'en',
         virtualizationThreshold: 50,
         extraColumnsWhenGrouping: true,
-        keepUncollapsedRowsOpen: false
+        keepUncollapsedRowsOpen: false,
+        uncollapsedRowsList: []
 
     },
         self = this;
@@ -1970,6 +1983,8 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
     };
 
     self.renderedRange = new ngRange(0, grid.minRowsToRender() + EXCESS_ROWS);
+    ngAggregate.prototype.keepUncollapsedRowsOpen = grid.config.keepUncollapsedRowsOpen;
+    ngAggregate.prototype.uncollapsedRowsList = grid.config.uncollapsedRowsList;
     self.buildEntityRow = function(entity, rowIndex) {
         return new ngRow(entity, self.rowConfig, self.selectionProvider, rowIndex, $utils);
     };
@@ -1977,8 +1992,8 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
     self.buildAggregateRow = function(aggEntity, rowIndex, keepOpen) {
         var agg = self.aggCache[aggEntity.aggIndex]; 
         if (!agg) {
-            agg = new ngAggregate(aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
-                !keepOpen);
+            agg = new ngAggregate( aggEntity, self, self.rowConfig.rowHeight, grid.config.groupsCollapsedByDefault &&
+                !keepOpen );
             self.aggCache[aggEntity.aggIndex] = agg;
         }
         agg.rowIndex = rowIndex;
@@ -2073,7 +2088,7 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
                 } else if (g.hasOwnProperty(prop)) {
                     var keepOpen = false;
                     if(grid.config.keepUncollapsedRowsOpen === true) {
-                        if(prop === 'Roberto0') {
+                        if( grid.config.uncollapsedRowsList.indexOf(prop) >= 0 ) {
                            keepOpen = true;
                         }
                     }
@@ -2128,9 +2143,9 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
                 var col = filterCols(cols, group)[0];
 
                 var val = $utils.evalProperty(model, group);
-                if( grid.config.keepUncollapsedRowsOpen ) {
+                if( grid.config.keepUncollapsedRowsOpen === true ) {
                     if( y == groups.length - 1) {
-                        keepOpen = ( val === 'Roberto0');
+                        keepOpen = ( grid.config.uncollapsedRowsList.indexOf(val) >= 0 );
                     }
                 }
                 val = val ? val.toString() : 'null';

@@ -4,6 +4,7 @@ This is a fork of the ng-grid project to allow user customize some gridOptions n
 * An property called 'extraColumnsWhenGrouping' to don't add extra columns in the row when there are groups.
 * Now 'aggregateTemplate' can accept an array instead of the template string. In that way we can specify different templates for each group level.
 * Added @semeltheone performance improvement to this folk.
+* New mode 'keepUncollapsedRowsOpen' added ( false by default ) which will store the last uncollapsed group in the 'uncollapsedRowsList' list property and when you print again the grid, it will keep the label-name groups matched open by default. It's up to you store this 'uncollapsedRowsList' variable safe in a localstorage, the scope of your application... to keep them open depending on where is it stored.
 
 ## Testing
 

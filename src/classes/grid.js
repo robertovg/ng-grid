@@ -190,7 +190,11 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         extraColumnsWhenGrouping: true,
 
         //Keep groups which are opened, opened when reopening
-        keepUncollapsedRowsOpen: false
+        keepUncollapsedRowsOpen: false,
+        
+        //Opened groups by default, if you want to persist them even when you create new ng-grid instance, then 
+        //  you have to store the array in a $scope variable of your application.
+        uncollapsedRowsList: []
 
     },
         self = this;
