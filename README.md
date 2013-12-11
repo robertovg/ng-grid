@@ -5,6 +5,7 @@ This is a fork of the ng-grid project to allow user customize some gridOptions n
 * Now 'aggregateTemplate' can accept an array instead of the template string. In that way we can specify different templates for each group level.
 * Added @semeltheone performance improvement to this folk.
 * New mode 'keepUncollapsedRowsOpen' added ( false by default ) which will store the last uncollapsed group in the 'uncollapsedRowsList' list property and when you print the grid again, it will keep the label-name groups matched open by default. It's up to you to store this 'uncollapsedRowsList' variable safe in a localstorage, the scope of your application, etc. to keep them open depending on where it is stored.
+* Now internal search mechanism don't go into object of rows. So in that way, it avoid the bug of returning prematurely when a cell contains an object (https://github.com/angular-ui/ng-grid/issues/603) and it focus on plain properties which makes it even faster.
 
 ## Testing
 

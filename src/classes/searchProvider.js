@@ -17,9 +17,8 @@
                     continue;
                 }
                 var pVal = item[prop];
-                if(typeof pVal === 'object'){
-                    return searchEntireRow(condition, pVal, c);
-                } else {
+                //Now I don't search through objects properties
+                if(typeof pVal !== 'object'){
                     var f = null,
                         s = null;
                     if (c && c.cellFilter) {

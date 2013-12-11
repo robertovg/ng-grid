@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 12/01/2013 14:06
+* Compiled At: 12/11/2013 21:54
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -2523,9 +2523,8 @@ var ngSearchProvider = function ($scope, grid, $filter) {
                     continue;
                 }
                 var pVal = item[prop];
-                if(typeof pVal === 'object'){
-                    return searchEntireRow(condition, pVal, c);
-                } else {
+                //Now I don't search through objects properties
+                if(typeof pVal !== 'object'){
                     var f = null,
                         s = null;
                     if (c && c.cellFilter) {
