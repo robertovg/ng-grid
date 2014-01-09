@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 01/09/2014 17:13
+* Compiled At: 01/09/2014 17:20
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -628,7 +628,6 @@ var ngAggregate = function (aggEntity, rowFactory, rowHeight, groupInitState) {
     this.rowFactory = rowFactory;
     this.rowHeight = rowHeight;
     this.isAggRow = true;
-    console.log('just to know if this work');
     if( this.leftOffsetForGroupRows ) {
         this.offsetLeft = aggEntity.gDepth * 25;
     } else {
