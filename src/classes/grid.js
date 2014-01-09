@@ -189,6 +189,9 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         //If false, when you group rows, it won't add extra columns at first
         extraColumnsWhenGrouping: true,
 
+        //Left offset for agregatte group rows
+        leftOffsetForGroupRows: true,
+
         //Keep groups which are opened, opened when reopening
         keepUncollapsedRowsOpen: false,
         

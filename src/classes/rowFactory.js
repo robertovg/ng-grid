@@ -24,6 +24,7 @@
     };
 
     self.renderedRange = new ngRange(0, grid.minRowsToRender() + EXCESS_ROWS);
+    ngAggregate.prototype.leftOffsetForGroupRows = grid.config.leftOffsetForGroupRows;
     ngAggregate.prototype.keepUncollapsedRowsOpen = grid.config.keepUncollapsedRowsOpen;
     ngAggregate.prototype.uncollapsedRowsList = grid.config.uncollapsedRowsList;
 

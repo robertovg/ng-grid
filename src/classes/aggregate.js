@@ -14,7 +14,12 @@ var ngAggregate = function (aggEntity, rowFactory, rowHeight, groupInitState) {
     this.rowFactory = rowFactory;
     this.rowHeight = rowHeight;
     this.isAggRow = true;
-    this.offsetLeft = aggEntity.gDepth * 25;
+    console.log('just to know if this work');
+    if( this.leftOffsetForGroupRows ) {
+        this.offsetLeft = aggEntity.gDepth * 25;
+    } else {
+        this.offsetLeft = 0;
+    }
     this.aggLabelFilter = aggEntity.aggLabelFilter;
 };
 

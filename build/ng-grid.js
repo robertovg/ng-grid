@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 12/11/2013 21:54
+* Compiled At: 01/09/2014 17:13
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -588,7 +588,12 @@ var ngAggregate = function (aggEntity, rowFactory, rowHeight, groupInitState) {
     this.rowFactory = rowFactory;
     this.rowHeight = rowHeight;
     this.isAggRow = true;
-    this.offsetLeft = aggEntity.gDepth * 25;
+    console.log('just to know if this work');
+    if( this.leftOffsetForGroupRows ) {
+        this.offsetLeft = aggEntity.gDepth * 25;
+    } else {
+        this.offsetLeft = 0;
+    }
     this.aggLabelFilter = aggEntity.aggLabelFilter;
 };
 
@@ -1207,6 +1212,7 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
         i18n: 'en',
         virtualizationThreshold: 50,
         extraColumnsWhenGrouping: true,
+        leftOffsetForGroupRows: true,
         keepUncollapsedRowsOpen: false,
         uncollapsedRowsList: []
 
@@ -1983,6 +1989,7 @@ var ngRowFactory = function (grid, $scope, domUtilityService, $templateCache, $u
     };
 
     self.renderedRange = new ngRange(0, grid.minRowsToRender() + EXCESS_ROWS);
+    ngAggregate.prototype.leftOffsetForGroupRows = grid.config.leftOffsetForGroupRows;
     ngAggregate.prototype.keepUncollapsedRowsOpen = grid.config.keepUncollapsedRowsOpen;
     ngAggregate.prototype.uncollapsedRowsList = grid.config.uncollapsedRowsList;
     self.buildEntityRow = function(entity, rowIndex) {
