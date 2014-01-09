@@ -14,7 +14,6 @@ var ngAggregate = function (aggEntity, rowFactory, rowHeight, groupInitState) {
     this.rowFactory = rowFactory;
     this.rowHeight = rowHeight;
     this.isAggRow = true;
-    console.log('just to know if this work');
     if( this.leftOffsetForGroupRows ) {
         this.offsetLeft = aggEntity.gDepth * 25;
     } else {
